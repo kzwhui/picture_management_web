@@ -12,6 +12,9 @@ def index(request):
     return render(request, 'manage_app/base.html')
 
 def register(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/hi/')
+
     # A boolean value for telling the template whether the registration was successful.
     # Set to False initially. Code changes value to True when registration succeeds.
     registered = False
@@ -51,6 +54,7 @@ def register(request):
 
             # Update our variable to tell the template registration was successful.
             registered = True
+            return render(request, 'manage_app/login.html', {"status_title" : "登录"})
 
         # Invalid form or forms - mistakes or something else?
         # Print problems to the terminal.
@@ -72,6 +76,9 @@ def register(request):
                    'profile_form' : profile_form} )
 
 def login(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/hi/')
+
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == 'POST':
         # Gather the username and password provided by the user.

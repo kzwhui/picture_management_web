@@ -1,0 +1,70 @@
+{% extends 'manage_app/base.html' %}
+
+{% load staticfiles %}
+
+{% block side_block %}
+{% endblock %}
+
+{% block body_block %}
+    <div class="col-md-4 col-sm-3 col-xs-1"></div>
+    <div class="col-md-4 col-sm-6 col-xs-10">
+        <h1 class="text-center">个人信息</h1>
+        <br />
+        <form class="form-horizontal" role="form" method="post" action="/hi/register/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="col-sm-3 control-label">用户名</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" name="username" placeholder="username"  value="{{ user_form.data.username }}" readonly>
+                </div>
+            </div>
+            {% if user_form.email.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+                <label class="col-sm-3 control-label">邮箱</label>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" name="email" placeholder="email" value="{{ user_form.data.email }}">
+                </div>
+            </div>
+            {% if user_form.password.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+                <label class="col-sm-3 control-label">密码</label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" name="password" placeholder="password">
+                </div>
+            </div>
+            {% if profile_form.website.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+                <label class="col-sm-3 control-label">网站</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" name="website" placeholder="website" value="{{ profile_form.data.website }}">
+                </div>
+            </div>
+            {% if profile_form.picture.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+                <label class="col-sm-3 control-label">用户头像</label>
+                <div class="col-sm-9">
+                    <input type="file" name="picture">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9 col-xs-offset-4 col-xs-8">
+                    <button type="submit" class="btn btn-default">重设</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4 col-sm-3 col-xs-1"></div>
+{% endblock %}
