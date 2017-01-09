@@ -89,7 +89,6 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        print username, password
         # Use Django's machinery to attempt to see if the username/password
         # combination is valid - a User object is returned if it is.
         user = auth.authenticate(username=username, password=password)
@@ -122,3 +121,46 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return render(request, 'manage_app/logout.html')
+
+@login_required
+def user_profile(request):
+    is_modified = False
+    user_form = None
+    profile_form = None
+    ip_address = request.META['HTTP_X_FORWARDED_FOR'] if request.META.has_key('HTTP_X_FORWARDED_FOR') else request.META['REMOTE_ADDR']
+
+    if request.method == 'POST':
+        user_form = UserExtraForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = request.user
+            user.email = user_form.cleaned_data['email']
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+
+            profile = UserProfile.objects.using('default').get(user_id=user.id)
+            profile.website = profile_form.cleaned_data['website']
+
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            profile.save(using='default')
+            #UserProfile.objects.using('default').filter(user_id=user.id)\
+            #           .update(website=profile_form.cleaned_data['website'])
+            is_modified = True
+        else:
+            print user_form.errors.as_data(), profile_form.errors.as_data()
+    else:
+        user_form = UserExtraForm()
+        profile_form = UserProfileForm()
+        user_form.data['username'] = request.user.username
+        user_form.data['email'] = request.user.email
+        profile_form.data['website'] = UserProfile.objects.using('default').get(user_id=request.user.id).website
+
+    return render(request,
+                  'manage_app/profile.html',
+                  {'is_modified' : is_modified,
+                   'ip_address' : ip_address,
+                   'user_form' : user_form,
+                   'profile_form' : profile_form} )
